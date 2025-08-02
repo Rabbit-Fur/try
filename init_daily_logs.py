@@ -27,12 +27,10 @@ log_entry = {
     "date": datetime.now().strftime("%Y-%m-%d"),
     "type": "project_log",
     "entries": [
-        {"category": "FUR SYSTEM",
-         "content": "daily_logs wurde erfolgreich initialisiert."},
-        {"category": "Codex",
-         "content": "Export zu GitHub folgt im nächsten Schritt."}
+        {"category": "FUR SYSTEM", "content": "daily_logs wurde erfolgreich initialisiert."},
+        {"category": "Codex", "content": "Export zu GitHub folgt im nächsten Schritt."},
     ],
-    "created_by": "Mai Diep Anh Do"
+    "created_by": "Mai Diep Anh Do",
 }
 
 # Eintrag speichern
