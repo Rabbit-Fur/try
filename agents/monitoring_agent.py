@@ -15,7 +15,10 @@ class MonitoringAgent:
         self.last_response = None
 
     def check_system(self) -> bool:
-        """Führt einen Healthcheck durch und cached das Ergebnis"""
+        """Führt einen Healthcheck durch und cached das Ergebnis.
+
+        Speichert Zeitstempel, Status und Antworttext des Health-Endpunkts.
+        """
         try:
             response = requests.get(self.health_url, timeout=self.timeout)
             self.last_check = datetime.utcnow()
@@ -31,7 +34,10 @@ class MonitoringAgent:
             return False
 
     def get_status(self) -> dict:
-        """Liefert den aktuellen Status als Dictionary"""
+        """Liefert den aktuellen Status als Dictionary.
+
+        Beinhaltet Zeitstempel, Statusflag und Rohantwort.
+        """
         return {
             "checked_at": self.last_check,
             "status_ok": self.last_status,

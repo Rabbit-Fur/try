@@ -119,7 +119,10 @@ async def run_bot(max_retries: int = 3) -> None:
 
 
 def is_ready() -> bool:
-    """Statusprüfung – ist der Bot bereit?"""
+    """Prüft, ob der Bot bereit ist.
+
+    Gibt ``True`` zurück, wenn das Bot-Objekt initialisiert und einsatzbereit ist.
+    """
     return bot is not None and getattr(bot, "is_ready", lambda: False)()
 
 

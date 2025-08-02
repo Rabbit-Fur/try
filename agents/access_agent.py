@@ -13,7 +13,10 @@ class AccessAgent:
         self.r3_roles = set(os.getenv("R3_ROLE_IDS", "").split(","))
 
     def get_user_role_level(self, discord_roles: list[str]) -> str:
-        """Bestimme die höchste Rollenstufe anhand der Discord-Rollenliste"""
+        """Bestimme die höchste Rollenstufe anhand der Discord-Rollenliste.
+
+        Gibt die Rolle mit dem höchsten Berechtigungsniveau zurück.
+        """
         if set(discord_roles) & self.admin_roles:
             return "admin"
         elif set(discord_roles) & self.r4_roles:
@@ -23,7 +26,10 @@ class AccessAgent:
         return "guest"
 
     def log_access(self, discord_id: str, action: str, result: str):
-        """Speichert einen Audit-Log über den Rollencheck"""
+        """Speichert einen Audit-Log über den Rollencheck.
+
+        Persistiert Discord-ID, Aktion, Ergebnis und Zeitpunkt in der Datenbank.
+        """
         self.db["access_logs"].insert_one(
             {
                 "discord_id": discord_id,
