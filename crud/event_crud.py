@@ -21,7 +21,20 @@ async def create_event(
     *,
     col=None,
 ) -> EventModel:
-    """Insert a new event document."""
+    """Insert a new event document into the collection.
+
+    Args:
+        event: The event to store in the database.
+        col: Optional MongoDB collection. Defaults to the module level
+            ``collection``.
+
+    Returns:
+        EventModel: The stored event with its ``id`` field populated.
+
+    Raises:
+        bson.errors.InvalidId: If the event contains an invalid ``_id`` field.
+        pymongo.errors.PyMongoError: If the insert operation fails.
+    """
     col = col if col is not None else collection
     if hasattr(event, "model_dump"):
         data = event.model_dump(by_alias=True)
@@ -39,7 +52,21 @@ async def get_event_by_id(
     *,
     col=None,
 ) -> Optional[EventModel]:
-    """Return a single event by ObjectId."""
+    """Return a single event by ObjectId.
+
+    Args:
+        event_id: The MongoDB ObjectId or its string representation.
+        col: Optional MongoDB collection. Defaults to the module level
+            ``collection``.
+
+    Returns:
+        Optional[EventModel]: The matching event or ``None`` if not found.
+
+    Raises:
+        bson.errors.InvalidId: If ``event_id`` cannot be converted to
+            :class:`~bson.ObjectId`.
+        pymongo.errors.PyMongoError: If the query fails.
+    """
     col = col if col is not None else collection
     if not isinstance(event_id, ObjectId):
         event_id = ObjectId(event_id)
@@ -52,7 +79,21 @@ async def delete_event_by_id(
     *,
     col=None,
 ) -> int:
-    """Delete an event by its ObjectId. Returns number of deleted docs."""
+    """Delete an event by its ObjectId.
+
+    Args:
+        event_id: The MongoDB ObjectId or its string representation.
+        col: Optional MongoDB collection. Defaults to the module level
+            ``collection``.
+
+    Returns:
+        int: Number of deleted documents (``0`` or ``1``).
+
+    Raises:
+        bson.errors.InvalidId: If ``event_id`` cannot be converted to
+            :class:`~bson.ObjectId`.
+        pymongo.errors.PyMongoError: If the delete operation fails.
+    """
     col = col if col is not None else collection
     if not isinstance(event_id, ObjectId):
         event_id = ObjectId(event_id)
@@ -65,7 +106,19 @@ async def get_events_by_guild(
     *,
     col=None,
 ) -> List[EventModel]:
-    """Return all events for a Discord guild."""
+    """Return all events for a Discord guild.
+
+    Args:
+        guild_id: Discord guild identifier whose events are requested.
+        col: Optional MongoDB collection. Defaults to the module level
+            ``collection``.
+
+    Returns:
+        List[EventModel]: List of matching events (may be empty).
+
+    Raises:
+        pymongo.errors.PyMongoError: If the query fails.
+    """
     col = col if col is not None else collection
     docs = await asyncio.to_thread(lambda: list(col.find({"guild_id": guild_id})))
     return [EventModel(**d) for d in docs]
@@ -77,7 +130,20 @@ async def get_events_in_range(
     *,
     col=None,
 ) -> List[EventModel]:
-    """Return events between ``start`` and ``end`` sorted by time."""
+    """Return events between ``start`` and ``end`` sorted by time.
+
+    Args:
+        start: Start of the time range (inclusive).
+        end: End of the time range (exclusive).
+        col: Optional MongoDB collection. Defaults to the module level
+            ``collection``.
+
+    Returns:
+        List[EventModel]: Events occurring in the given time span.
+
+    Raises:
+        pymongo.errors.PyMongoError: If the query fails.
+    """
     col = col if col is not None else collection
     docs = await asyncio.to_thread(
         lambda: list(col.find({"event_time": {"$gte": start, "$lt": end}}).sort("event_time", 1))
@@ -90,7 +156,17 @@ async def upsert_event(
     *,
     col=None,
 ) -> None:
-    """Upsert an event document by ``google_id`` field."""
+    """Upsert an event document by ``google_id`` field.
+
+    Args:
+        data: Event fields to update or insert. Must contain ``google_id``.
+        col: Optional MongoDB collection. Defaults to the module level
+            ``collection``.
+
+    Raises:
+        KeyError: If ``data`` does not include ``google_id``.
+        pymongo.errors.PyMongoError: If the upsert operation fails.
+    """
     col = col if col is not None else collection
     if asyncio.iscoroutinefunction(col.update_one):
         await col.update_one({"google_id": data["google_id"]}, {"$set": data}, upsert=True)
